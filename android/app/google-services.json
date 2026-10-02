@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1068388499914",
+    "project_id": "farah-zone",
+    "storage_bucket": "farah-zone.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1068388499914:android:984e41dd98bb705ee88f33",
+        "android_client_info": {
+          "package_name": "com.example.farah"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRoElTyySVIl1kCNOM-7NZiVKSV6V_s_M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

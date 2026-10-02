@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+import 'package:farah/widgets/home_app_bar.dart';
+import 'package:farah/widgets/home_drawer.dart';
+import 'package:farah/widgets/hero_section.dart';
+import 'package:farah/widgets/availability_calendar.dart';
+import 'package:farah/widgets/service_cards.dart';
+import 'package:farah/widgets/most_booked.dart';
+import 'package:farah/widgets/special_offers.dart';
+
+import 'package:farah/view/wedding_halls_screen.dart';
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   static const Color cream = Color(0xFFF3EDE2);
@@ -8,1090 +18,495 @@ class HomeScreen extends StatelessWidget {
   static const Color gold = Color(0xFFD4AF37);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: cream,
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
-      // =========================================================
-      // APP BAR
-      // =========================================================
+class _HomeScreenState extends State<HomeScreen> {
+  Set<String> _selectedCategories = {'قاعات الأفراح'};
 
-      appBar: AppBar(
-        backgroundColor: cream,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
+  void _handleCategoriesChanged(Set<String> categories) {
+    setState(() {
+      _selectedCategories = categories;
+    });
+  }
 
-        titleSpacing: 12,
+  final List<Map<String, dynamic>> _categories = [
+    {
+      'title': 'قاعات الأفراح',
+      'image': 'assets/images/fourSesones.jpg',
+      'icon': Icons.account_balance_outlined,
+    },
+    {
+      'title': 'صالونات التجميل',
+      'image': 'assets/images/makeup.jpg',
+      'icon': Icons.face_retouching_natural,
+    },
+    {
+      'title': 'التزيين والديكور',
+      'image': 'assets/images/wedding-decor.jpg',
+      'icon': Icons.auto_awesome_outlined,
+    },
+    {
+      'title': 'تأجير السيارات',
+      'image': 'assets/images/car.jpg',
+      'icon': Icons.directions_car_filled_outlined,
+    },
+    {
+      'title': 'قاعات الفنادق',
+      'image': 'assets/images/carmelHotel.jpg',
+      'icon': Icons.hotel_outlined,
+    },
+  ];
 
-        title: Row(
-          children: [
-            Container(
-              width: 38,
-              height: 38,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: gold,
-                  width: 1.2,
-                ),
-              ),
-              child: const Text(
-                'FZ',
-                style: TextStyle(
-                  color: navy,
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'LibertinusMath',
-                ),
-              ),
-            ),
+  void _openCategory(String title) {
+    Widget? screen;
 
-            const SizedBox(width: 8),
+    switch (title) {
+      case 'قاعات الأفراح':
+        screen = const WeddingHallsScreen();
+        break;
 
-            Flexible(
-              child: Text(
-                'FARAH ZONE',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: navy,
-                  fontSize: 16,
-                  letterSpacing: 1.2,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'LibertinusMath',
-                ),
-              ),
-            ),
-          ],
+    // Add your other screens here:
+    //
+    // case 'صالونات التجميل':
+    //   screen = const BeautySalonsScreen();
+    //   break;
+    //
+    // case 'التزيين والديكور':
+    //   screen = const DecorationScreen();
+    //   break;
+    //
+    // case 'تأجير السيارات':
+    //   screen = const CarRentalScreen();
+    //   break;
+    //
+    // case 'قاعات الفنادق':
+    //   screen = const HotelHallsScreen();
+    //   break;
+    }
+
+    if (screen != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => screen!,
         ),
+      );
+    }
+  }
 
-        actions: [
-          IconButton(
-            tooltip: 'Wishlist',
-            onPressed: () {
-              // Wishlist screen later
-            },
-            icon: const Icon(
-              Icons.favorite_border,
-              color: navy,
-              size: 22,
-            ),
-          ),
+  Widget _categoriesSection() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isLarge = constraints.maxWidth >= 900;
 
-          IconButton(
-            tooltip: 'My Requests',
-            onPressed: () {
-              // My requests screen later
-            },
-            icon: const Icon(
-              Icons.event_note_outlined,
-              color: navy,
-              size: 22,
-            ),
-          ),
+          final cardWidth = isLarge
+              ? (constraints.maxWidth - 56) / 5
+              : 170.0;
 
-          IconButton(
-            tooltip: 'Profile',
-            onPressed: () {
-              // Profile screen later
-            },
-            icon: const Icon(
-              Icons.person_outline,
-              color: navy,
-              size: 23,
-            ),
-          ),
+          return SizedBox(
+            height: 175,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              reverse: true,
+              physics: const BouncingScrollPhysics(),
+              itemCount: _categories.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 14),
+              itemBuilder: (context, index) {
+                final category = _categories[index];
 
-          const SizedBox(width: 4),
-        ],
-      ),
-
-      // =========================================================
-      // BODY
-      // =========================================================
-
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 25,
-          vertical: 20,
-        ),
-
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            // ===================================================
-            // WELCOME
-            // ===================================================
-
-            const Text(
-              'Welcome to Farah Zone',
-              style: TextStyle(
-                color: navy,
-                fontSize: 30,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'LibertinusMath',
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            Text(
-              'Find everything you need for your perfect celebration.',
-              style: TextStyle(
-                color: navy.withOpacity(0.65),
-                fontSize: 14,
-                height: 1.5,
-                fontFamily: 'LibertinusMath',
-              ),
-            ),
-
-            const SizedBox(height: 25),
-
-            // ===================================================
-            // SEARCH BAR
-            // ===================================================
-
-            _searchBar(context),
-
-            const SizedBox(height: 38),
-
-            // ===================================================
-            // CATEGORIES
-            // ===================================================
-
-            const Text(
-              'Explore Categories',
-              style: TextStyle(
-                color: navy,
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'LibertinusMath',
-              ),
-            ),
-
-            const SizedBox(height: 25),
-
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final bool isDesktop = constraints.maxWidth >= 700;
-
-                final double circleSize = isDesktop ? 160 : 110;
-
-                if (isDesktop) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _categoryItem(
-                        context,
-                        title: 'Wedding Halls',
-                        image: 'assets/images/fourSesones.jpg',
-                        size: circleSize,
-                      ),
-
-                      _categoryItem(
-                        context,
-                        title: 'Makeup Artists',
-                        image: 'assets/images/makeup.jpg',
-                        size: circleSize,
-                      ),
-
-                      _categoryItem(
-                        context,
-                        title: 'Decorations',
-                        image: 'assets/images/wedding-decor.jpg',
-                        size: circleSize,
-                      ),
-                    ],
-                  );
-                }
-
-                // MOBILE
-                return SizedBox(
-                  height: 160,
-
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-
-                    children: [
-                      const SizedBox(width: 10),
-
-                      _categoryItem(
-                        context,
-                        title: 'Wedding Halls',
-                        image: 'assets/images/fourSesones.jpg',
-                        size: circleSize,
-                      ),
-
-                      const SizedBox(width: 25),
-
-                      _categoryItem(
-                        context,
-                        title: 'Makeup Artists',
-                        image: 'assets/images/makeup.jpg',
-                        size: circleSize,
-                      ),
-
-                      const SizedBox(width: 25),
-
-                      _categoryItem(
-                        context,
-                        title: 'Decorations',
-                        image: 'assets/images/جلوريا.jpg',
-                        size: circleSize,
-                      ),
-
-                      const SizedBox(width: 10),
-                    ],
-                  ),
-                );
-              },
-            ),
-
-            const SizedBox(height: 55),
-
-            // ===================================================
-            // AVAILABLE SOON
-            // ===================================================
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-
-                const Expanded(
-                  child: Text(
-                    'Available Soon',
-                    style: TextStyle(
-                      color: navy,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'LibertinusMath',
-                    ),
-                  ),
-                ),
-
-                Text(
-                  'Nearest dates',
-                  style: TextStyle(
-                    color: navy.withOpacity(0.55),
-                    fontSize: 12,
-                    fontFamily: 'LibertinusMath',
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 7),
-
-            Text(
-              'Wedding halls with the nearest available dates',
-              style: TextStyle(
-                color: navy.withOpacity(0.60),
-                fontSize: 13,
-                fontFamily: 'LibertinusMath',
-              ),
-            ),
-
-            const SizedBox(height: 22),
-
-            // ===================================================
-            // AVAILABLE HALLS
-            // ===================================================
-
-            LayoutBuilder(
-              builder: (context, constraints) {
-
-                if (constraints.maxWidth >= 850) {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                      Expanded(
-                        child: _hallCard(
-                          image: 'assets/images/fourSesones.jpg',
-                          name: 'Four Seasons Hall',
-                          location: 'Ramallah',
-                          rating: '4.8',
-                          date: 'September 12, 2026',
-                        ),
-                      ),
-
-                      const SizedBox(width: 18),
-
-                      Expanded(
-                        child: _hallCard(
-                          image: 'assets/images/جلوريا.jpg',
-                          name: 'Gloria Hall',
-                          location: 'Nablus',
-                          rating: '4.7',
-                          date: 'September 15, 2026',
-                        ),
-                      ),
-
-                      const SizedBox(width: 18),
-
-                      Expanded(
-                        child: _hallCard(
-                          image: 'assets/images/مزايا.jpg',
-                          name: 'Mazaya Hall',
-                          location: 'Ramallah',
-                          rating: '4.6',
-                          date: 'September 18, 2026',
-                        ),
-                      ),
-                    ],
-                  );
-                }
-
-                return Column(
-                  children: [
-
-                    _hallCard(
-                      image: 'assets/images/fourSesones.jpg',
-                      name: 'Four Seasons Hall',
-                      location: 'Ramallah',
-                      rating: '4.8',
-                      date: 'September 12, 2026',
-                    ),
-
-                    const SizedBox(height: 18),
-
-                    _hallCard(
-                      image: 'assets/images/جلوريا.jpg',
-                      name: 'Gloria Hall',
-                      location: 'Nablus',
-                      rating: '4.7',
-                      date: 'September 15, 2026',
-                    ),
-
-                    const SizedBox(height: 18),
-
-                    _hallCard(
-                      image: 'assets/images/مزايا.jpg',
-                      name: 'Mazaya Hall',
-                      location: 'Ramallah',
-                      rating: '4.6',
-                      date: 'September 18, 2026',
-                    ),
-                  ],
-                );
-              },
-            ),
-
-            const SizedBox(height: 55),
-
-            // ===================================================
-            // SPECIAL OFFERS
-            // ===================================================
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-
-                const Text(
-                  'Special Offers',
-                  style: TextStyle(
-                    color: navy,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'LibertinusMath',
-                  ),
-                ),
-
-                TextButton(
-                  onPressed: () {
-                    // All offers later
+                return _categoryCard(
+                  title: category['title'],
+                  image: category['image'],
+                  icon: category['icon'],
+                  width: cardWidth,
+                  onTap: () {
+                    _openCategory(category['title']);
                   },
-                  child: const Text(
-                    'View All',
-                    style: TextStyle(
-                      color: navy,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'LibertinusMath',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 7),
-
-            Text(
-              'Exclusive offers for your special day',
-              style: TextStyle(
-                color: navy.withOpacity(0.60),
-                fontSize: 13,
-                fontFamily: 'LibertinusMath',
-              ),
-            ),
-
-            const SizedBox(height: 22),
-
-            // ===================================================
-            // OFFERS
-            // ===================================================
-
-            LayoutBuilder(
-              builder: (context, constraints) {
-
-                if (constraints.maxWidth >= 850) {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                      Expanded(
-                        child: _offerCard(
-                          image: 'assets/images/fourSesones.jpg',
-                          category: 'WEDDING HALL',
-                          title: '20% Off Wedding Packages',
-                          description:
-                          'Book your celebration package and enjoy a special discount.',
-                          discount: '20% OFF',
-                        ),
-                      ),
-
-                      const SizedBox(width: 18),
-
-                      Expanded(
-                        child: _offerCard(
-                          image: 'assets/images/makeup.jpg',
-                          category: 'MAKEUP & BEAUTY',
-                          title: 'Bridal Makeup Package',
-                          description:
-                          'Special bridal makeup package at an exclusive price.',
-                          discount: '15% OFF',
-                        ),
-                      ),
-
-                      const SizedBox(width: 18),
-
-                      Expanded(
-                        child: _offerCard(
-                          image: 'assets/images/wedding-decor.jpg',
-                          category: 'DECORATION',
-                          title: 'Wedding Decoration',
-                          description:
-                          'Create your dream atmosphere with our decoration package.',
-                          discount: '10% OFF',
-                        ),
-                      ),
-                    ],
-                  );
-                }
-
-                return Column(
-                  children: [
-
-                    _offerCard(
-                      image: 'assets/images/fourSesones.jpg',
-                      category: 'WEDDING HALL',
-                      title: '20% Off Wedding Packages',
-                      description:
-                      'Book your celebration package and enjoy a special discount.',
-                      discount: '20% OFF',
-                    ),
-
-                    const SizedBox(height: 18),
-
-                    _offerCard(
-                      image: 'assets/images/makeup.jpg',
-                      category: 'MAKEUP & BEAUTY',
-                      title: 'Bridal Makeup Package',
-                      description:
-                      'Special bridal makeup package at an exclusive price.',
-                      discount: '15% OFF',
-                    ),
-
-                    const SizedBox(height: 18),
-
-                    _offerCard(
-                      image: 'assets/images/wedding-decor.jpg',
-                      category: 'DECORATION',
-                      title: 'Wedding Decoration',
-                      description:
-                      'Create your dream atmosphere with our decoration package.',
-                      discount: '10% OFF',
-                    ),
-                  ],
                 );
               },
             ),
-
-            const SizedBox(height: 40),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
-  // =============================================================
-  // SEARCH BAR
-  // =============================================================
-
-  Widget _searchBar(BuildContext context) {
-    return Container(
-      height: 52,
-
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-
-        boxShadow: [
-          BoxShadow(
-            color: navy.withOpacity(0.06),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-
-      child: TextField(
-        style: const TextStyle(
-          color: navy,
-          fontSize: 13,
-          fontFamily: 'LibertinusMath',
-        ),
-
-        decoration: InputDecoration(
-          hintText: 'Search halls, makeup artists, decorations...',
-          hintStyle: TextStyle(
-            color: navy.withOpacity(0.40),
-            fontSize: 12,
-            fontFamily: 'LibertinusMath',
-          ),
-
-          prefixIcon: Icon(
-            Icons.search,
-            color: navy.withOpacity(0.55),
-            size: 21,
-          ),
-
-          suffixIcon: IconButton(
-            tooltip: 'Voice Search',
-            onPressed: () {
-              // STT will be connected here later
-            },
-            icon: const Icon(
-              Icons.mic_none,
-              color: navy,
-              size: 21,
-            ),
-          ),
-
-          filled: true,
-          fillColor: Colors.white,
-
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 15,
-            vertical: 15,
-          ),
-
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
-          ),
-
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
-          ),
-
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(
-              color: gold,
-              width: 1.2,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // =============================================================
-  // CATEGORY ITEM
-  // =============================================================
-
-  Widget _categoryItem(
-      BuildContext context, {
-        required String title,
-        required String image,
-        required double size,
-      }) {
-    return GestureDetector(
-      onTap: () {
-        // Navigation will be added later
-      },
-
-      child: SizedBox(
-        width: size + 30,
-
-        child: Column(
-          children: [
-
-            Container(
-              width: size,
-              height: size,
-
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-
-                border: Border.all(
-                  color: gold,
-                  width: 2,
-                ),
-
-                boxShadow: [
-                  BoxShadow(
-                    color: navy.withOpacity(0.12),
-                    blurRadius: 15,
-                    offset: const Offset(0, 7),
-                  ),
-                ],
-              ),
-
-              child: ClipOval(
-                child: Image.asset(
-                  image,
-                  fit: BoxFit.cover,
-
-                  errorBuilder: (
-                      context,
-                      error,
-                      stackTrace,
-                      ) {
-                    return Container(
-                      color: Colors.white,
-                      child: const Icon(
-                        Icons.image_outlined,
-                        color: gold,
-                        size: 40,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 14),
-
-            Text(
-              title,
-              textAlign: TextAlign.center,
-
-              style: const TextStyle(
-                color: navy,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'LibertinusMath',
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // =============================================================
-  // AVAILABLE HALL CARD
-  // =============================================================
-
-  Widget _hallCard({
-    required String image,
-    required String name,
-    required String location,
-    required String rating,
-    required String date,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-
-        boxShadow: [
-          BoxShadow(
-            color: navy.withOpacity(0.07),
-            blurRadius: 18,
-            offset: const Offset(0, 7),
-          ),
-        ],
-      ),
-
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-
-          // IMAGE
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(20),
-            ),
-
-            child: SizedBox(
-              height: 180,
-              width: double.infinity,
-
-              child: Image.asset(
-                image,
-                fit: BoxFit.cover,
-
-                errorBuilder: (
-                    context,
-                    error,
-                    stackTrace,
-                    ) {
-                  return Container(
-                    color: cream,
-                    child: const Center(
-                      child: Icon(
-                        Icons.image_outlined,
-                        color: gold,
-                        size: 45,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-
-          // INFORMATION
-          Padding(
-            padding: const EdgeInsets.all(17),
-
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-
-                Row(
-                  children: [
-
-                    Expanded(
-                      child: Text(
-                        name,
-                        style: const TextStyle(
-                          color: navy,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'LibertinusMath',
-                        ),
-                      ),
-                    ),
-
-                    const Icon(
-                      Icons.star,
-                      color: gold,
-                      size: 17,
-                    ),
-
-                    const SizedBox(width: 4),
-
-                    Text(
-                      rating,
-                      style: const TextStyle(
-                        color: navy,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 8),
-
-                Row(
-                  children: [
-
-                    Icon(
-                      Icons.location_on_outlined,
-                      color: navy.withOpacity(0.55),
-                      size: 16,
-                    ),
-
-                    const SizedBox(width: 5),
-
-                    Text(
-                      location,
-                      style: TextStyle(
-                        color: navy.withOpacity(0.60),
-                        fontSize: 12,
-                        fontFamily: 'LibertinusMath',
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 14),
-
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 11,
-                    vertical: 8,
-                  ),
-
-                  decoration: BoxDecoration(
-                    color: gold.withOpacity(0.10),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-
-                      const Icon(
-                        Icons.event_available_outlined,
-                        color: gold,
-                        size: 16,
-                      ),
-
-                      const SizedBox(width: 7),
-
-                      Flexible(
-                        child: Text(
-                          'Available $date',
-                          style: const TextStyle(
-                            color: navy,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'LibertinusMath',
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 15),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 42,
-
-                  child: OutlinedButton(
-                    onPressed: () {
-                      // Hall details later
-                    },
-
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(
-                        color: navy,
-                        width: 1,
-                      ),
-
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-
-                    child: const Text(
-                      'VIEW DETAILS',
-                      style: TextStyle(
-                        color: navy,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
-                        fontFamily: 'LibertinusMath',
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // =============================================================
-  // SPECIAL OFFER CARD
-  // =============================================================
-
-  Widget _offerCard({
-    required String image,
-    required String category,
+  Widget _categoryCard({
     required String title,
-    required String description,
-    required String discount,
+    required String image,
+    required IconData icon,
+    required double width,
+    required VoidCallback onTap,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-
-        boxShadow: [
-          BoxShadow(
-            color: navy.withOpacity(0.07),
-            blurRadius: 18,
-            offset: const Offset(0, 7),
-          ),
-        ],
-      ),
-
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-
-          // =====================================================
-          // IMAGE + DISCOUNT
-          // =====================================================
-
-          Stack(
-            children: [
-
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
+    return SizedBox(
+      width: width,
+      height: 170,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(24),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(24),
+          splashColor: HomeScreen.gold.withOpacity(.18),
+          highlightColor: HomeScreen.navy.withOpacity(.06),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: Colors.white.withOpacity(.85),
+                width: 1.2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: HomeScreen.navy.withOpacity(.15),
+                  blurRadius: 18,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 8),
                 ),
-
-                child: SizedBox(
-                  height: 170,
-                  width: double.infinity,
-
+              ],
+            ),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
                   child: Image.asset(
                     image,
                     fit: BoxFit.cover,
-
-                    errorBuilder: (
-                        context,
-                        error,
-                        stackTrace,
-                        ) {
-                      return Container(
-                        color: cream,
-                        child: const Center(
-                          child: Icon(
-                            Icons.image_outlined,
-                            color: gold,
-                            size: 45,
-                          ),
-                        ),
-                      );
-                    },
                   ),
                 ),
-              ),
 
-              // DISCOUNT BADGE
-              Positioned(
-                top: 14,
-                right: 14,
-
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-
+                Container(
                   decoration: BoxDecoration(
-                    color: gold,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-
-                  child: Text(
-                    discount,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
+                    borderRadius: BorderRadius.circular(24),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      stops: const [0.0, 0.42, 1.0],
+                      colors: [
+                        Colors.black.withOpacity(.05),
+                        HomeScreen.navy.withOpacity(.12),
+                        HomeScreen.navy.withOpacity(.90),
+                      ],
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
 
-          // =====================================================
-          // OFFER INFORMATION
-          // =====================================================
-
-          Padding(
-            padding: const EdgeInsets.all(17),
-
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-
-                Text(
-                  category,
-                  style: const TextStyle(
-                    color: gold,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
-                    fontFamily: 'LibertinusMath',
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(.94),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(.18),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      icon,
+                      color: HomeScreen.navy,
+                      size: 19,
+                    ),
                   ),
                 ),
 
-                const SizedBox(height: 8),
-
-                Text(
-                  title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-
-                  style: const TextStyle(
-                    color: navy,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'LibertinusMath',
+                Positioned(
+                  top: 12,
+                  left: 12,
+                  child: Container(
+                    width: 34,
+                    height: 34,
+                    decoration: const BoxDecoration(
+                      color: HomeScreen.gold,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back_rounded,
+                      color: HomeScreen.navy,
+                      size: 18,
+                    ),
                   ),
                 ),
 
-                const SizedBox(height: 8),
-
-                Text(
-                  description,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-
-                  style: TextStyle(
-                    color: navy.withOpacity(0.60),
-                    fontSize: 12,
-                    height: 1.4,
-                    fontFamily: 'LibertinusMath',
-                  ),
-                ),
-
-                const SizedBox(height: 15),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 40,
-
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Offer details later
-                    },
-
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: navy,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                Positioned(
+                  left: 12,
+                  right: 12,
+                  bottom: 12,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        title,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontFamily: 'LibertinusMath',
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          height: 1.15,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black87,
+                              blurRadius: 7,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-
-                    child: const Text(
-                      'VIEW OFFER',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
-                        fontFamily: 'LibertinusMath',
+                      const SizedBox(height: 4),
+                      Container(
+                        height: 2.5,
+                        width: 28,
+                        decoration: BoxDecoration(
+                          color: HomeScreen.gold,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _calendarSection() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 25, 20, 0),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: 900,
+          ),
+          child: AvailabilityCalendar(
+            selectedCategories: _selectedCategories,
+            onCategoriesChanged: _handleCategoriesChanged,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showSearchDialog() {
+    final TextEditingController searchController = TextEditingController();
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(.45),
+      builder: (dialogContext) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.symmetric(
+              horizontal: 24,
+              vertical: 24,
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(22),
+              decoration: BoxDecoration(
+                color: HomeScreen.cream,
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: HomeScreen.navy.withOpacity(.25),
+                    blurRadius: 30,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: HomeScreen.navy,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Icon(
+                          Icons.search_rounded,
+                          color: HomeScreen.gold,
+                          size: 23,
+                        ),
+                      ),
+
+                      const SizedBox(width: 12),
+
+                      const Expanded(
+                        child: Text(
+                          'ابحث عن خدماتك',
+                          style: TextStyle(
+                            fontFamily: 'LibertinusMath',
+                            color: HomeScreen.navy,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pop(dialogContext);
+                        },
+                        icon: const Icon(
+                          Icons.close_rounded,
+                          color: HomeScreen.navy,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: HomeScreen.navy.withOpacity(.08),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: HomeScreen.navy.withOpacity(.07),
+                          blurRadius: 12,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: TextField(
+                      controller: searchController,
+                      autofocus: true,
+                      textInputAction: TextInputAction.search,
+                      onSubmitted: (value) {
+                        if (value.trim().isEmpty) return;
+
+                        Navigator.pop(dialogContext);
+
+                        // TODO:
+                        // Add your search navigation/function here.
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'ابحث بالاسم أو القسم أو الموقع...',
+                        hintStyle: TextStyle(
+                          fontFamily: 'LibertinusMath',
+                          color: HomeScreen.navy.withOpacity(.45),
+                          fontSize: 14,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.search_rounded,
+                          color: HomeScreen.navy,
+                        ),
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            searchController.clear();
+                          },
+                          icon: Icon(
+                            Icons.close_rounded,
+                            size: 19,
+                            color: HomeScreen.navy.withOpacity(.45),
+                          ),
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                      ),
+                      style: const TextStyle(
+                        fontFamily: 'LibertinusMath',
+                        color: HomeScreen.navy,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.lightbulb_outline_rounded,
+                        size: 18,
+                        color: HomeScreen.gold,
+                      ),
+                      const SizedBox(width: 7),
+                      Expanded(
+                        child: Text(
+                          'ابحث عن قاعة، صالون، ديكور أو خدمة تناسب احتفالك.',
+                          style: TextStyle(
+                            fontFamily: 'LibertinusMath',
+                            color: HomeScreen.navy.withOpacity(.65),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        backgroundColor: HomeScreen.cream,
+        appBar: const HomeAppBar(),
+        drawer: const HomeDrawer(),
+        body: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              HeroSection(
+
+              ),
+
+              _categoriesSection(),
+
+              const SizedBox(height: 5),
+
+              _calendarSection(),
+
+              const SizedBox(height: 25),
+
+              const ServiceCards(),
+
+              const MostBookedSection(),
+
+              const SpecialOffersSection(),
+
+              const SizedBox(height: 40),
+            ],
+          ),
+        ),
       ),
     );
   }
